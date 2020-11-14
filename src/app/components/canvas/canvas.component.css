@@ -1,0 +1,23 @@
+.canvas {
+    width: 100%;
+    /* background: yellow; */
+    height: 500px;
+    display: flex;
+    /* flex-direction: column; */
+    justify-content: space-evenly;
+    align-content: center;
+}
+.bar {
+    /* background: red; */
+    /* border: 1px solid black; */
+}
+.inner-bar {
+    background: turquoise;
+    border-left: 1px solid black;
+}
+.selected {
+    background: pink;
+}
+.sorted {
+    background: purple;
+}
