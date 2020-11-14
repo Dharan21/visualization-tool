@@ -14,7 +14,7 @@
             </select>
         </div>
         <div class="col-auto">
-            <button type="submit" class="btn btn-primary mb-2">Sort</button>
+            <button type="submit" [disabled]="sortingStarted" class="btn btn-primary mb-2">Sort</button>
             <button type="button" class="btn btn-primary mb-2 ml-2" (click)="onReset()">Reset</button>
         </div>
     </div>

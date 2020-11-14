@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CanvasService } from 'src/app/services/canvas.service';
 
 @Component({
@@ -7,15 +7,26 @@ import { CanvasService } from 'src/app/services/canvas.service';
     styleUrls: ['form.component.css']
 })
 export class FormComponent implements OnInit {
-    constructor(public canvasService: CanvasService) { }
+    sortingStarted = false;
+    constructor(
+        public canvasService: CanvasService,
+        public cdr: ChangeDetectorRef
+    ) { }
     ngOnInit(): void { }
 
     onSliderChange(event: { newValue: number, oldValue: number }): void {
-        this.canvasService.createCanvas(event.newValue);
+        if (!this.sortingStarted) {
+            this.canvasService.createCanvas(event.newValue);
+        }
     }
 
     onSubmit(): void {
+        const canvasSize = this.canvasService.canvas.length;
+        this.sortingStarted = true;
         this.canvasService.sortCanvas.next(true);
+        setTimeout(() => {
+            this.sortingStarted = false;
+        }, (((canvasSize - 1) * (canvasSize - 2)) / 2.0) * 1500);
     }
 
     onReset(): void {

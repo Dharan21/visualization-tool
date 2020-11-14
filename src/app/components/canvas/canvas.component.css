@@ -14,6 +14,7 @@
 .inner-bar {
     background: turquoise;
     border-left: 1px solid black;
+    /* transition: linear 0.05s; */
 }
 .selected {
     background: pink;
