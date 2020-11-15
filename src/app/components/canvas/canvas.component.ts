@@ -1,6 +1,7 @@
-import { Component, OnInit, HostListener, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
 import { CanvasService } from 'src/app/services/canvas.service';
 import { Subscription } from 'rxjs';
+import * as Enums from './../../utils/enums';
 
 @Component({
     selector: 'app-canvas',
@@ -48,9 +49,53 @@ export class CanvasComponent implements OnInit, OnDestroy {
     }
 
     sortCanvas(method: number): void {
-        if (method === 1) {
-            this.bubbleSort();
+        switch (method) {
+            case Enums.SortAlgoValues.BubbleSort:
+                this.bubbleSort();
+                break;
+            case Enums.SortAlgoValues.QuickSort:
+                console.log(this.canvas);
+                this.quickSort(this.canvas, 0, this.canvas.length - 1);
+                break;
         }
+    }
+
+    quickSort(arr: number[], low: number, high: number): void {
+        if (low < high) {
+            const pi = this.partition(arr, low, high);
+            console.log(arr);
+            this.quickSort(arr, low, pi - 1);
+            this.quickSort(arr, pi + 1, high);
+        } else if (low === high) {
+            const bars = document.getElementsByClassName('inner-bar');
+            bars[low].classList.add('sorted');
+        }
+    }
+
+    private partition(arr: number[], low: number, high: number): number {
+        const bars = document.getElementsByClassName('inner-bar');
+        const pivot = arr[low];
+        let i = low + 1;
+        let j = high;
+        while (i <= j) {
+            console.log('hit');
+            while (arr[i] <= pivot) {
+                i++;
+            }
+            while (arr[j] > pivot) {
+                j--;
+            }
+            if (i < j) {
+                const temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+        const outerTemp = arr[low];
+        arr[low] = arr[j];
+        arr[j] = outerTemp;
+        bars[j].classList.add('sorted');
+        return j;
     }
 
     bubbleSort(): void {

@@ -1,9 +1,11 @@
 .canvas {
     width: 100%;
-    height: 500px;
+    height: 400px;
     display: flex;
     justify-content: space-evenly;
     align-content: center;
+    transform: rotatex(180deg);
+    /* margin-bottom: 50px; */
 }
 .bar {
     /* background: red; */
@@ -18,4 +20,7 @@
 }
 .sorted {
     background: purple;
+}
+.pivot {
+    background-color: blue;
 }

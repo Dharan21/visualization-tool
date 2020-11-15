@@ -15,7 +15,7 @@ export class FormComponent implements OnInit {
     constructor(
         public canvasService: CanvasService
     ) { }
-    ngOnInit(): void { 
+    ngOnInit(): void {
         this.canvasService.stopSorting.subscribe(res => {
             this.sortingStarted = !res;
         });
