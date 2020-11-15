@@ -1,5 +1,9 @@
+import * as Enums from './enums';
+
 export const SortMethodsDropdown = [
-    { value: 1, name: 'Bubble Sort' }
+    { value: Enums.SortAlgoValues.BubbleSort, name: 'Bubble Sort' },
+    // { value: Enums.SortAlgoValues.QuickSort, name: 'Quick Sort' },
+    { value: Enums.SortAlgoValues.SelectionSort, name: 'Selection Sort' },
 ]
 
 export const SpeedDropdown = [

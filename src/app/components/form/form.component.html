@@ -1,6 +1,6 @@
 <form #f="ngForm" (ngSubmit)="onSubmit(f)">
     <div class="form-row align-items-center">
-        <div class="col-auto pb-2">
+        <div class="col-auto pb-2 mr-2">
             <label class="mr-3" for="range">Elements</label>
             <mv-slider id="range" [min]="2" [max]="100" (change)="onSliderChange($event)"></mv-slider>
         </div>

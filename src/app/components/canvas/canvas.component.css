@@ -1,11 +1,11 @@
 .canvas {
     width: 100%;
-    /* background: yellow; */
-    height: 500px;
+    height: 400px;
     display: flex;
-    /* flex-direction: column; */
     justify-content: space-evenly;
     align-content: center;
+    transform: rotatex(180deg);
+    /* margin-bottom: 50px; */
 }
 .bar {
     /* background: red; */
@@ -14,11 +14,13 @@
 .inner-bar {
     background: turquoise;
     border-left: 1px solid black;
-    /* transition: linear 0.05s; */
 }
 .selected {
     background: pink;
 }
 .sorted {
     background: purple;
+}
+.traverse {
+    background-color: blue;
 }

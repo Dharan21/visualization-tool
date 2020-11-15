@@ -1,6 +1,7 @@
-import { Component, OnInit, HostListener, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
 import { CanvasService } from 'src/app/services/canvas.service';
 import { Subscription } from 'rxjs';
+import * as Enums from './../../utils/enums';
 
 @Component({
     selector: 'app-canvas',
@@ -48,9 +49,53 @@ export class CanvasComponent implements OnInit, OnDestroy {
     }
 
     sortCanvas(method: number): void {
-        if (method === 1) {
-            this.bubbleSort();
+        switch (method) {
+            case Enums.SortAlgoValues.BubbleSort:
+                this.bubbleSort();
+                break;
+            case Enums.SortAlgoValues.QuickSort:
+                this.quickSort(this.canvas, 0, this.canvas.length - 1);
+                break;
+            case Enums.SortAlgoValues.SelectionSort:
+                this.selectionSort();
+                break;
         }
+    }
+
+    quickSort(arr: number[], low: number, high: number): void {
+        if (low < high) {
+            const pi = this.partition(arr, low, high);
+            this.quickSort(arr, low, pi - 1);
+            this.quickSort(arr, pi + 1, high);
+        } else if (low === high) {
+            const bars = document.getElementsByClassName('inner-bar');
+            bars[low].classList.add('sorted');
+        }
+    }
+
+    private partition(arr: number[], low: number, high: number): number {
+        const bars = document.getElementsByClassName('inner-bar');
+        const pivot = arr[low];
+        let i = low + 1;
+        let j = high;
+        while (i <= j) {
+            while (arr[i] <= pivot) {
+                i++;
+            }
+            while (arr[j] > pivot) {
+                j--;
+            }
+            if (i < j) {
+                const temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+        const outerTemp = arr[low];
+        arr[low] = arr[j];
+        arr[j] = outerTemp;
+        bars[j].classList.add('sorted');
+        return j;
     }
 
     bubbleSort(): void {
@@ -102,6 +147,60 @@ export class CanvasComponent implements OnInit, OnDestroy {
         this.timeoutId = window.setTimeout(() => {
             bars[0].classList.add('sorted');
         }, (totalSteps - 1) * stepTime);
+    }
+
+    selectionSort(): void {
+        const len = this.canvas.length;
+        const bars = document.getElementsByClassName('inner-bar');
+        let totalTime = 0;
+        let totalSteps = 0;
+        const stepTime = this.speed;
+        const stepsArr: number[] = [];
+        for (let i = 1; i < len; i++) {
+            const steps = ((len - i) * 3) + 2;
+            stepsArr.push(steps);
+        }
+        totalSteps = stepsArr.reduce((a, b) => a + b);
+        totalSteps += 1;
+        totalTime = totalSteps * stepTime;
+        setTimeout(() => {
+            this.canvasService.stopSorting.next(true);
+        }, totalTime);
+        for (let i = 0; i < len - 1; i++) {
+            let counter = 0;
+            if (i !== 0) {
+                counter = stepsArr.slice(0, i).reduce((a, b) => a + b) * stepTime;
+            }
+            setTimeout(() => {
+                let minIndex = i;
+                bars[minIndex].classList.add('selected');
+                for (let j = i + 1; j < len; j++) {
+                    setTimeout(() => {
+                        bars[j].classList.add('traverse');
+                    }, j === i + 1 ? 0 : (j - (i + 1)) * 3 * stepTime);
+                    setTimeout(() => {
+                        if (this.canvas[minIndex] > this.canvas[j]) {
+                            minIndex = j;
+                        }
+                    }, j === i + 1 ? stepTime : ((j - (i + 1)) * 3 * stepTime) + stepTime);
+                    setTimeout(() => {
+                        bars[j].classList.remove('traverse');
+                    }, j === i + 1 ? 2 * stepTime : ((j - (i + 1)) * 3 * stepTime) + (2 * stepTime));
+                }
+                setTimeout(() => {
+                    bars[i].classList.remove('selected');
+                    const temp = this.canvas[i];
+                    this.canvas[i] = this.canvas[minIndex];
+                    this.canvas[minIndex] = temp;
+                }, (stepsArr[i] - 2) * stepTime);
+                setTimeout(() => {
+                    bars[i].classList.add('sorted');
+                }, (stepsArr[i] - 1) * stepTime);
+            }, counter);
+            setTimeout(() => {
+                bars[len - 1].classList.add('sorted');
+            }, (totalSteps - 1) * stepTime);
+        }
     }
 
     clearAllTimeouts(): void {
