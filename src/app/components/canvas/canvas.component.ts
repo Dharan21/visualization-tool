@@ -54,7 +54,6 @@ export class CanvasComponent implements OnInit, OnDestroy {
                 this.bubbleSort();
                 break;
             case Enums.SortAlgoValues.QuickSort:
-                console.log(this.canvas);
                 this.quickSort(this.canvas, 0, this.canvas.length - 1);
                 break;
         }
@@ -63,7 +62,6 @@ export class CanvasComponent implements OnInit, OnDestroy {
     quickSort(arr: number[], low: number, high: number): void {
         if (low < high) {
             const pi = this.partition(arr, low, high);
-            console.log(arr);
             this.quickSort(arr, low, pi - 1);
             this.quickSort(arr, pi + 1, high);
         } else if (low === high) {
@@ -78,7 +76,6 @@ export class CanvasComponent implements OnInit, OnDestroy {
         let i = low + 1;
         let j = high;
         while (i <= j) {
-            console.log('hit');
             while (arr[i] <= pivot) {
                 i++;
             }
