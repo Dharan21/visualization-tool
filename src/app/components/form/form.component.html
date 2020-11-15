@@ -1,0 +1,26 @@
+<form #f="ngForm" (ngSubmit)="onSubmit(f)">
+    <div class="form-row align-items-center">
+        <div class="col-auto pb-2">
+            <label class="mr-3" for="range">Elements</label>
+            <mv-slider id="range" [min]="2" [max]="100" (change)="onSliderChange($event)"></mv-slider>
+        </div>
+        <div class="col-auto pb-2">
+            <label class="sr-only" for="algo"></label>
+            <select class="custom-select" ngModel #algo name="algo" required>
+                <option value="" disabled>Select Algorithm</option>
+                <option *ngFor="let item of methodDropdown" [ngValue]="item.value">{{ item.name }}</option>
+            </select>
+        </div>
+        <div class="col-auto pb-2">
+            <label class="sr-only" for="algo"></label>
+            <select class="custom-select" ngModel #speed name="speed" required>
+                <option value="" disabled>Select Speed</option>
+                <option *ngFor="let item of speedDropdown" [ngValue]="item.stepTime">{{ item.name }}</option>
+            </select>
+        </div>
+        <div class="col-auto pb-2 mt-2">
+            <button type="submit" [disabled]="!f.valid || sortingStarted" class="btn btn-primary mb-2">Sort</button>
+            <button type="button" class="btn btn-primary mb-2 ml-2" (click)="onReset()">Reset</button>
+        </div>
+    </div>
+</form>
