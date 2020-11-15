@@ -5,9 +5,9 @@ import { Subject } from 'rxjs';
 export class CanvasService {
     canvasSize: number;
     canvasSizeChange = new Subject<number>();
-    canvas: number[] = [75, 25];
+    canvas: number[] = [75, 25, 15, 26, 85];
     public canvasChanged = new Subject<number[]>();
-    public sortCanvas = new Subject<boolean>();
+    public sortCanvas = new Subject<{algo: number, speed: number}>();
     public stopSorting = new Subject<boolean>();
 
     getCanvas(): number[] {

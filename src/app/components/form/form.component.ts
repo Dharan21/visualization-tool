@@ -1,5 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { CanvasService } from 'src/app/services/canvas.service';
+import * as Constants from './../../utils/constants';
 
 @Component({
     selector: 'app-form',
@@ -8,11 +10,16 @@ import { CanvasService } from 'src/app/services/canvas.service';
 })
 export class FormComponent implements OnInit {
     sortingStarted = false;
+    speedDropdown = Constants.SpeedDropdown;
+    methodDropdown = Constants.SortMethodsDropdown;
     constructor(
-        public canvasService: CanvasService,
-        public cdr: ChangeDetectorRef
+        public canvasService: CanvasService
     ) { }
-    ngOnInit(): void { }
+    ngOnInit(): void { 
+        this.canvasService.stopSorting.subscribe(res => {
+            this.sortingStarted = !res;
+        });
+    }
 
     onSliderChange(event: { newValue: number, oldValue: number }): void {
         if (!this.sortingStarted) {
@@ -20,13 +27,10 @@ export class FormComponent implements OnInit {
         }
     }
 
-    onSubmit(): void {
-        const canvasSize = this.canvasService.canvas.length;
+    onSubmit(form: NgForm): void {
         this.sortingStarted = true;
-        this.canvasService.sortCanvas.next(true);
-        setTimeout(() => {
-            this.sortingStarted = false;
-        }, (((canvasSize - 1) * (canvasSize - 2)) / 2.0) * 1500);
+        console.log(form.value);
+        this.canvasService.sortCanvas.next(form.value);
     }
 
     onReset(): void {

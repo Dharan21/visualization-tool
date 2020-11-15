@@ -15,6 +15,7 @@ export class CanvasComponent implements OnInit, OnDestroy {
     windowsWidth: number;
     canvasSub: Subscription;
     timeoutId: number;
+    speed: number;
 
     constructor(
         private canvasService: CanvasService
@@ -31,13 +32,9 @@ export class CanvasComponent implements OnInit, OnDestroy {
             this.canvas = canvas;
             this.calculateBarWidth();
         });
-        this.canvasService.sortCanvas.subscribe(wantToSort => {
-            if (wantToSort) { this.sortCanvas(1); }
-        })
-        this.canvasService.stopSorting.subscribe(result => {
-            if (result) {
-                this.clearAllTimeouts();
-            }
+        this.canvasService.sortCanvas.subscribe((res: { algo: number, speed: number }) => {
+            this.speed = res.speed;
+            this.sortCanvas(res.algo);
         });
         this.calculateBarWidth();
     }
@@ -59,33 +56,52 @@ export class CanvasComponent implements OnInit, OnDestroy {
     bubbleSort(): void {
         const len = this.canvas.length;
         const bars = document.getElementsByClassName('inner-bar');
-        for (let i = 0; i < len; i++) {
-            const outerWait = i * 1500;
+        let totalTime = 0;
+        let totalSteps = 0;
+        const stepTime = this.speed;
+        const stepsArr: number[] = [];
+        for (let i = 1; i < len; i++) {
+            const steps = ((len - i) * 3) + 1;
+            stepsArr.push(steps);
+        }
+        totalSteps = stepsArr.reduce((a, b) => a + b);
+        totalSteps += 1;
+        totalTime = totalSteps * stepTime;
+        setTimeout(() => {
+            this.canvasService.stopSorting.next(true);
+        }, totalTime);
+        for (let i = 0; i < len - 1; i++) {
+            let counter = 0;
+            if (i !== 0) {
+                counter = stepsArr.slice(0, i).reduce((a, b) => a + b) * stepTime;
+            }
             this.timeoutId = window.setTimeout(() => {
-                const counter = 1500 / (len - i);
                 for (let j = 0; j < len - i - 1; j++) {
-                    const innerWait = outerWait + counter * j;
                     this.timeoutId = window.setTimeout(() => {
                         bars[j].classList.add('selected');
                         bars[j + 1].classList.add('selected');
-                    }, innerWait);
+                    }, j === 0 ? 0 : j * 3 * stepTime);
                     this.timeoutId = window.setTimeout(() => {
                         if (this.canvas[j] > this.canvas[j + 1]) {
                             const temp = this.canvas[j];
                             this.canvas[j] = this.canvas[j + 1];
                             this.canvas[j + 1] = temp;
                         }
-                    }, innerWait + (counter / 3));
+                    }, j === 0 ? stepTime : (j * 3 * stepTime) + stepTime);
                     this.timeoutId = window.setTimeout(() => {
                         bars[j].classList.remove('selected');
                         bars[j + 1].classList.remove('selected');
-                    }, innerWait + ((counter / 3) * 2));
+                    }, j === 0 ? 2 * stepTime : (j * 3 * stepTime) + (2 * stepTime));
                 }
                 this.timeoutId = window.setTimeout(() => {
                     bars[len - i - 1].classList.add('sorted');
-                }, outerWait + (counter * (len - i - 1)));
-            }, outerWait);
+                }, (stepsArr[i] - 1) * stepTime);
+            }, counter);
+
         }
+        this.timeoutId = window.setTimeout(() => {
+            bars[0].classList.add('sorted');
+        }, (totalSteps - 1) * stepTime);
     }
 
     clearAllTimeouts(): void {
