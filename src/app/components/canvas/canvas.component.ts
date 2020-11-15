@@ -56,6 +56,9 @@ export class CanvasComponent implements OnInit, OnDestroy {
             case Enums.SortAlgoValues.QuickSort:
                 this.quickSort(this.canvas, 0, this.canvas.length - 1);
                 break;
+            case Enums.SortAlgoValues.SelectionSort:
+                this.selectionSort();
+                break;
         }
     }
 
@@ -144,6 +147,60 @@ export class CanvasComponent implements OnInit, OnDestroy {
         this.timeoutId = window.setTimeout(() => {
             bars[0].classList.add('sorted');
         }, (totalSteps - 1) * stepTime);
+    }
+
+    selectionSort(): void {
+        const len = this.canvas.length;
+        const bars = document.getElementsByClassName('inner-bar');
+        let totalTime = 0;
+        let totalSteps = 0;
+        const stepTime = this.speed;
+        const stepsArr: number[] = [];
+        for (let i = 1; i < len; i++) {
+            const steps = ((len - i) * 3) + 2;
+            stepsArr.push(steps);
+        }
+        totalSteps = stepsArr.reduce((a, b) => a + b);
+        totalSteps += 1;
+        totalTime = totalSteps * stepTime;
+        setTimeout(() => {
+            this.canvasService.stopSorting.next(true);
+        }, totalTime);
+        for (let i = 0; i < len - 1; i++) {
+            let counter = 0;
+            if (i !== 0) {
+                counter = stepsArr.slice(0, i).reduce((a, b) => a + b) * stepTime;
+            }
+            setTimeout(() => {
+                let minIndex = i;
+                bars[minIndex].classList.add('selected');
+                for (let j = i + 1; j < len; j++) {
+                    setTimeout(() => {
+                        bars[j].classList.add('traverse');
+                    }, j === i + 1 ? 0 : (j - (i + 1)) * 3 * stepTime);
+                    setTimeout(() => {
+                        if (this.canvas[minIndex] > this.canvas[j]) {
+                            minIndex = j;
+                        }
+                    }, j === i + 1 ? stepTime : ((j - (i + 1)) * 3 * stepTime) + stepTime);
+                    setTimeout(() => {
+                        bars[j].classList.remove('traverse');
+                    }, j === i + 1 ? 2 * stepTime : ((j - (i + 1)) * 3 * stepTime) + (2 * stepTime));
+                }
+                setTimeout(() => {
+                    bars[i].classList.remove('selected');
+                    const temp = this.canvas[i];
+                    this.canvas[i] = this.canvas[minIndex];
+                    this.canvas[minIndex] = temp;
+                }, (stepsArr[i] - 2) * stepTime);
+                setTimeout(() => {
+                    bars[i].classList.add('sorted');
+                }, (stepsArr[i] - 1) * stepTime);
+            }, counter);
+            setTimeout(() => {
+                bars[len - 1].classList.add('sorted');
+            }, (totalSteps - 1) * stepTime);
+        }
     }
 
     clearAllTimeouts(): void {
