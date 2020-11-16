@@ -18,9 +18,9 @@
 .selected {
     background: pink;
 }
-.sorted {
-    background: purple;
-}
 .traverse {
     background-color: blue;
+}
+.sorted {
+    background: purple!important;
 }
