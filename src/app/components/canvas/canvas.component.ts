@@ -59,6 +59,63 @@ export class CanvasComponent implements OnInit, OnDestroy {
             case Enums.SortAlgoValues.SelectionSort:
                 this.selectionSort();
                 break;
+            case Enums.SortAlgoValues.InsertionSort:
+                this.insertionSort();
+                break;
+        }
+    }
+
+    insertionSort(): void {
+        const len = this.canvas.length;
+        const whileCountArr: number[] = [];
+        const tempCanvas = this.canvas.slice();
+        for (let i = 0; i < len; i++) {
+            const temp = tempCanvas[i];
+            let j = i;
+            let whileCount = 0;
+            while (j > 0 && temp < tempCanvas[j - 1]) {
+                whileCount += 1;
+                tempCanvas[j] = tempCanvas[j - 1];
+                j -= 1;
+            }
+            whileCountArr.push(whileCount);
+            tempCanvas[j] = temp;
+        }
+        const bars = document.getElementsByClassName('inner-bar');
+        let totalTime = 0;
+        let totalSteps = 0;
+        const stepTime = this.speed;
+        const stepsArr = whileCountArr.map(x => (x * 2) + 3);
+        totalSteps = stepsArr.reduce((a, b) => a + b);
+        totalSteps += 1;
+        totalTime = totalSteps * stepTime;
+        window.setTimeout(() => {
+            this.canvasService.stopSorting.next(true);
+        }, totalTime);
+        for (let i = 0; i < len; i++) {
+            window.setTimeout(() => {
+                const temp = this.canvas[i];
+                let j = i;
+                for (let k = 0; k < whileCountArr[i]; k++) {
+                    setTimeout(() => {
+                        if (k === 0) {
+                            bars[i - k].classList.add('traverse');
+                        } else {
+                            bars[i - k + 1].classList.add('traverse');
+                        }
+                    }, k * 2 * stepTime);
+                    setTimeout(() => {
+                        this.canvas[j] = this.canvas[j - 1];
+                        j -= 1;
+                    }, (k * 2 * stepTime) + stepTime);
+                }
+                window.setTimeout(() => {
+                    this.canvas[j] = temp;
+                }, ((whileCountArr[i] * 2) * stepTime) + stepTime);
+                window.setTimeout(() => {
+                    bars[j].classList.add('sorted');
+                }, ((whileCountArr[i] * 2) * stepTime) + (2 * stepTime));
+            }, i === 0 ? 0 : stepsArr.slice(0, i).reduce((a, b) => a + b) * stepTime);
         }
     }
 
