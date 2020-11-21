@@ -4,7 +4,8 @@ export const SortMethodsDropdown = [
     { value: Enums.SortAlgoValues.BubbleSort, name: 'Bubble Sort' },
     { value: Enums.SortAlgoValues.QuickSort, name: 'Quick Sort' },
     { value: Enums.SortAlgoValues.SelectionSort, name: 'Selection Sort' },
-    { value: Enums.SortAlgoValues.InsertionSort, name: 'Insertion Sort' }
+    { value: Enums.SortAlgoValues.InsertionSort, name: 'Insertion Sort' },
+    { value: Enums.SortAlgoValues.MergeSort, name: 'Merge Sort' }
 ]
 
 export const SpeedDropdown = [
