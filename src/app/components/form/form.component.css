@@ -1,3 +1,62 @@
 label {
     font-weight: 500;
 }
+
+h3 {
+    font-weight: 900;
+    margin: 0;
+}
+
+.header {
+    width: 100%;
+    background-color: var(--header-background);
+    color: var(--header-text-color);
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    padding: 0 30px;
+    justify-content: space-between;
+}
+.header .header-array {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+.sub-header {
+    width: 100%;
+    min-height: 50px;
+    background-color: var(--color-4);
+    color: var(--header-background);
+    display: flex;
+    padding: 0 30px;
+    align-items: center;
+}
+.btn {
+    background-color: var(--header-text-color);
+    color: var(--header-background);
+    border-color: var(--header-text-color);
+}
+
+.sub-header .btn {
+    width: 90%;
+    margin: 0 5%;
+}
+
+.custom-select {
+    padding: 0;
+    width: 90%;
+    margin: 0 5%;
+    padding-left: 10px;
+}
+
+@media only screen and (max-width: 763px) {
+    .header .header-array {
+        justify-content: space-between;
+    }
+
+}
+@media only screen and (max-width: 400px) {
+    .header, .sub-header {
+        padding: 0 5px;
+    }
+}

@@ -12,19 +12,25 @@ export class FormComponent implements OnInit {
     sortingStarted = false;
     speedDropdown = Constants.SpeedDropdown;
     methodDropdown = Constants.SortMethodsDropdown;
+    arraySize = 10;
     constructor(
         public canvasService: CanvasService
     ) { }
+
     ngOnInit(): void {
+        this.canvasService.createCanvas(this.arraySize);
         this.canvasService.stopSorting.subscribe(res => {
             this.sortingStarted = !res;
         });
     }
 
-    onSliderChange(event: { newValue: number, oldValue: number }): void {
-        if (!this.sortingStarted) {
-            this.canvasService.createCanvas(event.newValue);
-        }
+    onSliderChange(event): void {
+        this.arraySize = +event.target.value;
+        this.canvasService.createCanvas(event.target.value);
+    }
+
+    onGenerate(): void {
+        this.canvasService.createCanvas(this.arraySize);
     }
 
     onSubmit(form: NgForm): void {

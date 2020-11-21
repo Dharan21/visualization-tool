@@ -4,3 +4,9 @@ export enum SortAlgoValues {
     SelectionSort = 3,
     InsertionSort = 4
 }
+
+export enum ColorConsts {
+    Selected = 'selected',
+    Sorted = 'sorted',
+    Traversing = 'traverse'
+}

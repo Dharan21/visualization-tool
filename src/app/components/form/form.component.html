@@ -1,26 +1,38 @@
+<div class="header row m-0 py-2">
+    <div class="col-sm-12 col-md-4">
+        <h3>Sorting Visualizer</h3>
+    </div>
+    <div class="col-sm-12 col-md-8">
+        <div class="header-array">
+            <div class="array-slider d-flex align-items-center mr-2 my-1">
+                <label class="m-0 mr-3" for="range">Array Size</label>
+                <input type="range" id="range" [value]="arraySize" min="5" max="50" (change)="onSliderChange($event)" [disabled]="sortingStarted">
+            </div>
+            <button type="button" class="btn my-1" [disabled]="sortingStarted" (click)="onGenerate()">Generate New Array</button>
+        </div>
+    </div>
+</div>
 <form #f="ngForm" (ngSubmit)="onSubmit(f)">
-    <div class="form-row align-items-center">
-        <div class="col-auto pb-2 mr-2">
-            <label class="mr-3" for="range">Elements</label>
-            <mv-slider id="range" [min]="2" [max]="100" (change)="onSliderChange($event)"></mv-slider>
-        </div>
-        <div class="col-auto pb-2">
-            <label class="sr-only" for="algo"></label>
-            <select class="custom-select" ngModel #algo name="algo" required>
-                <option value="" disabled>Select Algorithm</option>
-                <option *ngFor="let item of methodDropdown" [ngValue]="item.value">{{ item.name }}</option>
-            </select>
-        </div>
-        <div class="col-auto pb-2">
-            <label class="sr-only" for="algo"></label>
-            <select class="custom-select" ngModel #speed name="speed" required>
-                <option value="" disabled>Select Speed</option>
-                <option *ngFor="let item of speedDropdown" [ngValue]="item.stepTime">{{ item.name }}</option>
-            </select>
-        </div>
-        <div class="col-auto pb-2 mt-2">
-            <button type="submit" [disabled]="!f.valid || sortingStarted" class="btn btn-primary mb-2">Sort</button>
-            <button type="button" class="btn btn-primary mb-2 ml-2" (click)="onReset()">Reset</button>
+    <div class="sub-header">
+        <div class="row m-0" style="width: 100%;">
+            <div class="col-sm-6 col-md-4 p-0" style="margin: 5px auto 0 auto;">
+                <label class="sr-only" for="algo">Algorithm</label>
+                <select class="custom-select" ngModel #algo name="algo" required>
+                    <option value="" disabled>Select Algorithm</option>
+                    <option *ngFor="let item of methodDropdown" [ngValue]="item.value">{{ item.name }}</option>
+                </select>
+            </div>
+            <div class="col-sm-6 col-md-4 p-0" style="margin: 5px auto 5px auto;">
+                <label class="sr-only" for="algo">Speed</label>
+                <select class="custom-select" ngModel #speed name="speed" required>
+                    <option value="" disabled>Select Speed</option>
+                    <option *ngFor="let item of speedDropdown" [ngValue]="item.stepTime">{{ item.name }}</option>
+                </select>
+            </div>
+            <div class="col-sm-12 col-md-4 d-flex justify-content-between align-items-center p-0" style="margin-bottom: 5px;">
+                <button type="submit" [disabled]="!f.valid || sortingStarted" class="btn btn-primary">Sort</button>
+                <button type="button" class="btn btn-primary" (click)="onReset()">Reset</button>
+            </div>
         </div>
     </div>
 </form>
