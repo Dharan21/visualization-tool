@@ -17,6 +17,7 @@ export class CanvasComponent implements OnInit, OnDestroy {
     canvasSub: Subscription;
     timeoutId: number;
     speed: number;
+    delay = 0;
 
     constructor(
         private canvasService: CanvasService
@@ -54,7 +55,7 @@ export class CanvasComponent implements OnInit, OnDestroy {
                 this.bubbleSort();
                 break;
             case Enums.SortAlgoValues.QuickSort:
-                this.quickSort(this.canvas, 0, this.canvas.length - 1);
+                this.quick();
                 break;
             case Enums.SortAlgoValues.SelectionSort:
                 this.selectionSort();
@@ -65,58 +66,41 @@ export class CanvasComponent implements OnInit, OnDestroy {
         }
     }
 
-    insertionSort(): void {
-        const len = this.canvas.length;
-        const whileCountArr: number[] = [];
-        const tempCanvas = this.canvas.slice();
-        for (let i = 0; i < len; i++) {
-            const temp = tempCanvas[i];
-            let j = i;
-            let whileCount = 0;
-            while (j > 0 && temp < tempCanvas[j - 1]) {
-                whileCount += 1;
-                tempCanvas[j] = tempCanvas[j - 1];
-                j -= 1;
-            }
-            whileCountArr.push(whileCount);
-            tempCanvas[j] = temp;
-        }
-        const bars = document.getElementsByClassName('inner-bar');
-        let totalTime = 0;
-        let totalSteps = 0;
-        const stepTime = this.speed;
-        const stepsArr = whileCountArr.map(x => (x * 2) + 3);
-        totalSteps = stepsArr.reduce((a, b) => a + b);
-        totalSteps += 1;
-        totalTime = totalSteps * stepTime;
+    quick(): void {
+        this.delay = 0;
+        this.quickSort(this.canvas.slice(), 0, this.canvas.length - 1);
         window.setTimeout(() => {
             this.canvasService.stopSorting.next(true);
-        }, totalTime);
+        }, this.delay += this.speed);
+    }
+
+    insertionSort(): void {
+        this.delay = 0;
+        const arr = this.canvas.slice();
+        const len = arr.length;
         for (let i = 0; i < len; i++) {
-            window.setTimeout(() => {
-                const temp = this.canvas[i];
-                let j = i;
-                for (let k = 0; k < whileCountArr[i]; k++) {
-                    setTimeout(() => {
-                        if (k === 0) {
-                            bars[i - k].classList.add('traverse');
-                        } else {
-                            bars[i - k + 1].classList.add('traverse');
-                        }
-                    }, k * 2 * stepTime);
-                    setTimeout(() => {
-                        this.canvas[j] = this.canvas[j - 1];
-                        j -= 1;
-                    }, (k * 2 * stepTime) + stepTime);
-                }
-                window.setTimeout(() => {
-                    this.canvas[j] = temp;
-                }, ((whileCountArr[i] * 2) * stepTime) + stepTime);
-                window.setTimeout(() => {
-                    bars[j].classList.add('sorted');
-                }, ((whileCountArr[i] * 2) * stepTime) + (2 * stepTime));
-            }, i === 0 ? 0 : stepsArr.slice(0, i).reduce((a, b) => a + b) * stepTime);
+            this.toggleClass([i], Enums.ColorConsts.Selected);
+            const height = arr[i];
+            let j = i;
+            while (j >= 1 && arr[j - 1] > height) {
+                arr[j] = arr[j - 1];
+                this.applyHeight(j, arr[j - 1]);
+                j--;
+            }
+            this.toggleClass([i], Enums.ColorConsts.Selected, false);
+            arr[j] = height;
+            this.applyHeight(j, height);
+            this.makeBarSorted(j);
         }
+        window.setTimeout(() => {
+            this.canvasService.stopSorting.next(true);
+        }, this.delay += this.speed);
+    }
+
+    applyHeight(index: number, height: number): void {
+        window.setTimeout(() => {
+            this.canvas[index] = height;
+        }, this.delay += this.speed);
     }
 
     quickSort(arr: number[], low: number, high: number): void {
@@ -125,34 +109,71 @@ export class CanvasComponent implements OnInit, OnDestroy {
             this.quickSort(arr, low, pi - 1);
             this.quickSort(arr, pi + 1, high);
         } else if (low === high) {
-            const bars = document.getElementsByClassName('inner-bar');
-            bars[low].classList.add('sorted');
+            window.setTimeout(() => {
+                const bars = document.getElementsByClassName('inner-bar');
+                bars[low].classList.add(Enums.ColorConsts.Sorted);
+            }, this.delay += this.speed);
         }
     }
 
     private partition(arr: number[], low: number, high: number): number {
-        const bars = document.getElementsByClassName('inner-bar');
         const pivot = arr[low];
+        this.toggleClass([low], Enums.ColorConsts.Selected);
         let i = low + 1;
         let j = high;
         while (i <= j) {
             while (arr[i] <= pivot) {
+                this.toggleClass([i], Enums.ColorConsts.Traversing);
                 i++;
+                this.toggleClass([i - 1], Enums.ColorConsts.Traversing, false);
             }
             while (arr[j] > pivot) {
+                this.toggleClass([j], Enums.ColorConsts.Traversing);
                 j--;
+                this.toggleClass([j + 1], Enums.ColorConsts.Traversing, false);
             }
             if (i < j) {
+                this.swapAnimation(i, j);
                 const temp = arr[i];
                 arr[i] = arr[j];
                 arr[j] = temp;
             }
         }
+        this.toggleClass([low], Enums.ColorConsts.Selected, false);
+        this.swapAnimation(low, j);
         const outerTemp = arr[low];
         arr[low] = arr[j];
         arr[j] = outerTemp;
-        bars[j].classList.add('sorted');
+        this.makeBarSorted(j);
         return j;
+    }
+
+    makeBarSorted(i: number): void {
+        window.setTimeout(() => {
+            const bars = document.getElementsByClassName('inner-bar');
+            bars[i].classList.add(Enums.ColorConsts.Sorted);
+        }, this.delay += this.speed);
+    }
+
+    toggleClass(indexs: number[], className: string, isAdd: boolean = true): void {
+        window.setTimeout(() => {
+            const bars = document.getElementsByClassName('inner-bar');
+            indexs.forEach(x => {
+                if (isAdd) {
+                    bars[x].classList.add(className);
+                } else {
+                    bars[x].classList.remove(className);
+                }
+            });
+        }, this.delay += this.speed);
+    }
+
+    swapAnimation(i: number, j: number): void {
+        window.setTimeout(() => {
+            const temp = this.canvas[i];
+            this.canvas[i] = this.canvas[j];
+            this.canvas[j] = temp;
+        }, this.delay += this.speed);
     }
 
     bubbleSort(): void {
@@ -257,12 +278,6 @@ export class CanvasComponent implements OnInit, OnDestroy {
             setTimeout(() => {
                 bars[len - 1].classList.add('sorted');
             }, (totalSteps - 1) * stepTime);
-        }
-    }
-
-    clearAllTimeouts(): void {
-        while (this.timeoutId--) {
-            window.clearTimeout(this.timeoutId);
         }
     }
 

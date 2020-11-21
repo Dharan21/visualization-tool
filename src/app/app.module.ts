@@ -1,6 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { NgxBootstrapSliderModule } from 'ngx-bootstrap-slider';
 
 import { AppComponent } from './app.component';
 import { FormComponent } from './components/form/form.component';
@@ -18,8 +17,7 @@ import { CanvasComponent } from './components/canvas/canvas.component';
     BrowserModule,
     NgbModule,
     FormsModule,
-    ReactiveFormsModule,
-    NgxBootstrapSliderModule
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
