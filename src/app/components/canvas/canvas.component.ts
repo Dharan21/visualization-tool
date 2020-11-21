@@ -63,15 +63,94 @@ export class CanvasComponent implements OnInit, OnDestroy {
             case Enums.SortAlgoValues.InsertionSort:
                 this.insertionSort();
                 break;
+            case Enums.SortAlgoValues.MergeSort:
+                this.applyMergeSort();
+                break;
         }
     }
 
-    quick(): void {
+    applyMergeSort(): void {
         this.delay = 0;
-        this.quickSort(this.canvas.slice(), 0, this.canvas.length - 1);
+        this.mergeSort(this.canvas.slice(), 0, this.canvas.length - 1);
         window.setTimeout(() => {
             this.canvasService.stopSorting.next(true);
         }, this.delay += this.speed);
+    }
+
+    merge(arr: number[], l: number, m: number, r: number): void {
+        let isLastCall = false;
+        if (l === 0 && r === this.canvas.length - 1) {
+            isLastCall = true;
+        }
+        const n1 = m - l + 1;
+        const n2 = r - m;
+
+        const L: number[] = [];
+        const R: number[] = [];
+
+        for (let i = 0; i < n1; i++) {
+            L.push(arr[l + i]);
+        }
+        for (let j = 0; j < n2; j++) {
+            R.push(arr[m + 1 + j]);
+        }
+
+        let i = 0;
+        let j = 0;
+
+        let k = l;
+        while (i < n1 && j < n2) {
+            this.toggleClass([l + i, m + 1 + j], Enums.ColorConsts.Selected);
+            if (L[i] <= R[j]) {
+                arr[k] = L[i];
+                this.toggleClass([l + i, m + 1 + j], Enums.ColorConsts.Selected, false);
+                this.applyHeight(k, L[i]);
+                i++;
+            }
+            else {
+                arr[k] = R[j];
+                this.toggleClass([l + i, m + 1 + j], Enums.ColorConsts.Selected, false);
+                this.applyHeight(k, R[j]);
+                j++;
+            }
+            if (isLastCall) {
+                this.makeBarSorted(k);
+            }
+            k++;
+        }
+
+        while (i < n1) {
+            this.toggleClass([l + i], Enums.ColorConsts.Traversing);
+            arr[k] = L[i];
+            this.toggleClass([l + i], Enums.ColorConsts.Traversing, false);
+            this.applyHeight(k, L[i]);
+            i++;
+            k++;
+            if (isLastCall) {
+                this.makeBarSorted(k - 1);
+            }
+        }
+
+        while (j < n2) {
+            this.toggleClass([m + 1 + j], Enums.ColorConsts.Traversing);
+            arr[k] = R[j];
+            this.toggleClass([m + j + 1], Enums.ColorConsts.Traversing, false);
+            this.applyHeight(k, R[j]);
+            j++;
+            k++;
+            if (isLastCall) {
+                this.makeBarSorted(k - 1);
+            }
+        }
+    }
+
+    mergeSort(arr: number[], l: number, r: number): void {
+        if (l < r) {
+            const m = Math.floor((l + r) / 2);
+            this.mergeSort(arr, l, m);
+            this.mergeSort(arr, m + 1, r);
+            this.merge(arr, l, m, r);
+        }
     }
 
     insertionSort(): void {
@@ -97,9 +176,11 @@ export class CanvasComponent implements OnInit, OnDestroy {
         }, this.delay += this.speed);
     }
 
-    applyHeight(index: number, height: number): void {
+    quick(): void {
+        this.delay = 0;
+        this.quickSort(this.canvas.slice(), 0, this.canvas.length - 1);
         window.setTimeout(() => {
-            this.canvas[index] = height;
+            this.canvasService.stopSorting.next(true);
         }, this.delay += this.speed);
     }
 
@@ -116,7 +197,7 @@ export class CanvasComponent implements OnInit, OnDestroy {
         }
     }
 
-    private partition(arr: number[], low: number, high: number): number {
+    partition(arr: number[], low: number, high: number): number {
         const pivot = arr[low];
         this.toggleClass([low], Enums.ColorConsts.Selected);
         let i = low + 1;
@@ -146,34 +227,6 @@ export class CanvasComponent implements OnInit, OnDestroy {
         arr[j] = outerTemp;
         this.makeBarSorted(j);
         return j;
-    }
-
-    makeBarSorted(i: number): void {
-        window.setTimeout(() => {
-            const bars = document.getElementsByClassName('inner-bar');
-            bars[i].classList.add(Enums.ColorConsts.Sorted);
-        }, this.delay += this.speed);
-    }
-
-    toggleClass(indexs: number[], className: string, isAdd: boolean = true): void {
-        window.setTimeout(() => {
-            const bars = document.getElementsByClassName('inner-bar');
-            indexs.forEach(x => {
-                if (isAdd) {
-                    bars[x].classList.add(className);
-                } else {
-                    bars[x].classList.remove(className);
-                }
-            });
-        }, this.delay += this.speed);
-    }
-
-    swapAnimation(i: number, j: number): void {
-        window.setTimeout(() => {
-            const temp = this.canvas[i];
-            this.canvas[i] = this.canvas[j];
-            this.canvas[j] = temp;
-        }, this.delay += this.speed);
     }
 
     bubbleSort(): void {
@@ -279,6 +332,40 @@ export class CanvasComponent implements OnInit, OnDestroy {
                 bars[len - 1].classList.add('sorted');
             }, (totalSteps - 1) * stepTime);
         }
+    }
+
+    makeBarSorted(i: number): void {
+        window.setTimeout(() => {
+            const bars = document.getElementsByClassName('inner-bar');
+            bars[i].classList.add(Enums.ColorConsts.Sorted);
+        }, this.delay += this.speed);
+    }
+
+    toggleClass(indexs: number[], className: string, isAdd: boolean = true): void {
+        window.setTimeout(() => {
+            const bars = document.getElementsByClassName('inner-bar');
+            indexs.forEach(x => {
+                if (isAdd) {
+                    bars[x].classList.add(className);
+                } else {
+                    bars[x].classList.remove(className);
+                }
+            });
+        }, this.delay += this.speed);
+    }
+
+    swapAnimation(i: number, j: number): void {
+        window.setTimeout(() => {
+            const temp = this.canvas[i];
+            this.canvas[i] = this.canvas[j];
+            this.canvas[j] = temp;
+        }, this.delay += this.speed);
+    }
+
+    applyHeight(index: number, height: number): void {
+        window.setTimeout(() => {
+            this.canvas[index] = height;
+        }, this.delay += this.speed);
     }
 
     ngOnDestroy(): void {
