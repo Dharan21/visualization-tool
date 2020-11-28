@@ -82,64 +82,43 @@ export class CanvasComponent implements OnInit, OnDestroy {
         if (l === 0 && r === this.canvas.length - 1) {
             isLastCall = true;
         }
-        const n1 = m - l + 1;
-        const n2 = r - m;
-
-        const L: number[] = [];
-        const R: number[] = [];
-
-        for (let i = 0; i < n1; i++) {
-            L.push(arr[l + i]);
-        }
-        for (let j = 0; j < n2; j++) {
-            R.push(arr[m + 1 + j]);
-        }
-
-        let i = 0;
-        let j = 0;
-
-        let k = l;
-        while (i < n1 && j < n2) {
-            this.toggleClass([l + i, m + 1 + j], Enums.ColorConsts.Selected);
-            if (L[i] <= R[j]) {
-                arr[k] = L[i];
-                this.toggleClass([l + i, m + 1 + j], Enums.ColorConsts.Selected, false);
-                this.applyHeight(k, L[i]);
-                i++;
-            }
-            else {
-                arr[k] = R[j];
-                this.toggleClass([l + i, m + 1 + j], Enums.ColorConsts.Selected, false);
-                this.applyHeight(k, R[j]);
+        let i = l;
+        let j = m + 1;
+        while (i <= j && i < r && j <= r) {
+            this.toggleClass([i], Enums.ColorConsts.Selected);
+            if (arr[i] > arr[j]) {
+                this.toggleClass([j], Enums.ColorConsts.Selected);
+                if (j + 1 === i || i + 1 === j) {
+                    const temp = arr[j];
+                    arr[j] = arr[i];
+                    arr[i] = temp;
+                } else if (j > i) {
+                    const height = arr[j];
+                    for (let k = j - 1; k >= i; k--) {
+                        arr[k + 1] = arr[k];
+                    }
+                    arr[i] = height;
+                } else {
+                    const height = arr[i];
+                    for (let k = i - 1; k >= j; k--) {
+                        arr[k + 1] = arr[k];
+                    }
+                    arr[j] = height;
+                }
+                this.moveAnimation(j, i);
+                this.toggleClass([j], Enums.ColorConsts.Selected, false);
                 j++;
             }
+            this.toggleClass([i], Enums.ColorConsts.Selected, false);
             if (isLastCall) {
-                this.makeBarSorted(k);
+                this.makeBarSorted(i);
             }
-            k++;
-        }
-
-        while (i < n1) {
-            this.toggleClass([l + i], Enums.ColorConsts.Traversing);
-            arr[k] = L[i];
-            this.toggleClass([l + i], Enums.ColorConsts.Traversing, false);
-            this.applyHeight(k, L[i]);
             i++;
-            k++;
-            if (isLastCall) {
-                this.makeBarSorted(k - 1);
-            }
         }
-
-        while (j < n2) {
-            this.toggleClass([m + 1 + j], Enums.ColorConsts.Traversing);
-            arr[k] = R[j];
-            this.toggleClass([m + j + 1], Enums.ColorConsts.Traversing, false);
-            this.applyHeight(k, R[j]);
-            j++;
-            k++;
-            if (isLastCall) {
-                this.makeBarSorted(k - 1);
+        if (isLastCall && j > r) {
+            while (i <= r) {
+                this.makeBarSorted(i);
+                i++;
             }
         }
     }
@@ -365,6 +344,28 @@ export class CanvasComponent implements OnInit, OnDestroy {
     applyHeight(index: number, height: number): void {
         window.setTimeout(() => {
             this.canvas[index] = height;
+        }, this.delay += this.speed);
+    }
+
+    moveAnimation(fromIndex: number, toIndex: number): void {
+        window.setTimeout(() => {
+            if (fromIndex + 1 === toIndex || toIndex + 1 === fromIndex) {
+                const temp = this.canvas[fromIndex];
+                this.canvas[fromIndex] = this.canvas[toIndex];
+                this.canvas[toIndex] = temp;
+            } else if (fromIndex > toIndex) {
+                const height = this.canvas[fromIndex];
+                for (let i = fromIndex - 1; i >= toIndex; i--) {
+                    this.canvas[i + 1] = this.canvas[i];
+                }
+                this.canvas[toIndex] = height;
+            } else {
+                const height = this.canvas[toIndex];
+                for (let i = toIndex - 1; i >= fromIndex; i--) {
+                    this.canvas[i + 1] = this.canvas[i];
+                }
+                this.canvas[fromIndex] = height;
+            }
         }, this.delay += this.speed);
     }
 
