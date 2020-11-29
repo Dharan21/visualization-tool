@@ -17,7 +17,7 @@ export class CanvasService {
     createCanvas(size: number): void {
         this.emptyCanvas();
         for (let i = 0; i < size; i++) {
-            const height = Math.random() * 100 + 1;
+            const height = 10 + Math.random() * (100 - 10);
             this.canvas.push(height);
         }
         this.canvasChanged.next(this.canvas);

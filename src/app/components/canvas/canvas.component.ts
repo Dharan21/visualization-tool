@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
+import { Component, OnInit, HostListener, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CanvasService } from 'src/app/services/canvas.service';
 import { Subscription } from 'rxjs';
 import * as Enums from './../../utils/enums';
@@ -20,7 +20,8 @@ export class CanvasComponent implements OnInit, OnDestroy {
     delay = 0;
 
     constructor(
-        private canvasService: CanvasService
+        private canvasService: CanvasService,
+        private cdr: ChangeDetectorRef
     ) { }
 
     @HostListener('window:resize', ['$event'])
@@ -115,7 +116,7 @@ export class CanvasComponent implements OnInit, OnDestroy {
             }
             i++;
         }
-        if (isLastCall && j > r) {
+        if (isLastCall) {
             while (i <= r) {
                 this.makeBarSorted(i);
                 i++;
@@ -349,22 +350,17 @@ export class CanvasComponent implements OnInit, OnDestroy {
 
     moveAnimation(fromIndex: number, toIndex: number): void {
         window.setTimeout(() => {
+            const bars = document.getElementsByClassName('inner-bar') as HTMLCollection;
             if (fromIndex + 1 === toIndex || toIndex + 1 === fromIndex) {
-                const temp = this.canvas[fromIndex];
-                this.canvas[fromIndex] = this.canvas[toIndex];
-                this.canvas[toIndex] = temp;
+                const temp = (bars[fromIndex] as HTMLElement).style.height;
+                (bars[fromIndex] as HTMLElement).style.height = (bars[toIndex] as HTMLElement).style.height;
+                (bars[toIndex] as HTMLElement).style.height = temp;
             } else if (fromIndex > toIndex) {
-                const height = this.canvas[fromIndex];
+                const height = (bars[fromIndex] as HTMLElement).style.height;
                 for (let i = fromIndex - 1; i >= toIndex; i--) {
-                    this.canvas[i + 1] = this.canvas[i];
+                    (bars[i + 1] as HTMLElement).style.height = (bars[i] as HTMLElement).style.height;
                 }
-                this.canvas[toIndex] = height;
-            } else {
-                const height = this.canvas[toIndex];
-                for (let i = toIndex - 1; i >= fromIndex; i--) {
-                    this.canvas[i + 1] = this.canvas[i];
-                }
-                this.canvas[fromIndex] = height;
+                (bars[toIndex] as HTMLElement).style.height = height;
             }
         }, this.delay += this.speed);
     }
