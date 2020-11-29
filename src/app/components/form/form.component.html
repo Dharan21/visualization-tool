@@ -6,7 +6,7 @@
         <div class="header-array">
             <div class="array-slider d-flex align-items-center mr-2 my-1">
                 <label class="m-0 mr-3" for="range">Array Size</label>
-                <input type="range" id="range" [value]="arraySize" min="5" max="50" (change)="onSliderChange($event)" [disabled]="sortingStarted">
+                <input type="range" id="range" [value]="arraySize" min="5" max="100" (change)="onSliderChange($event)" [disabled]="sortingStarted">
             </div>
             <button type="button" class="btn my-1" [disabled]="sortingStarted" (click)="onGenerate()">Generate New Array</button>
         </div>
