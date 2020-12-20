@@ -18,6 +18,7 @@ export class CanvasComponent implements OnInit, OnDestroy {
     timeoutId: number;
     speed: number;
     delay = 0;
+    onceShorted = false;
 
     constructor(
         private canvasService: CanvasService,
@@ -32,6 +33,7 @@ export class CanvasComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.canvas = this.canvasService.getCanvas();
         this.canvasSub = this.canvasService.canvasChanged.subscribe(canvas => {
+            this.onceShorted = false;
             this.canvas = canvas;
             this.calculateBarWidth();
         });
@@ -42,8 +44,6 @@ export class CanvasComponent implements OnInit, OnDestroy {
         this.calculateBarWidth();
     }
 
-
-
     calculateBarWidth(): void {
         this.windowsWidth = window.innerWidth;
         const width = (this.windowsWidth - 100) / this.canvas.length;
@@ -51,6 +51,13 @@ export class CanvasComponent implements OnInit, OnDestroy {
     }
 
     sortCanvas(method: number): void {
+        if (this.onceShorted) {
+            this.canvas = this.canvas.sort((a, b) => a - b);
+            const bars = document.getElementsByClassName('inner-bar');
+            for(let i= 0; i < bars.length; i++) {
+                bars[i].classList.value = 'inner-bar';
+            }
+        }
         switch (method) {
             case Enums.SortAlgoValues.BubbleSort:
                 this.bubbleSort();
@@ -68,6 +75,7 @@ export class CanvasComponent implements OnInit, OnDestroy {
                 this.applyMergeSort();
                 break;
         }
+        this.onceShorted = true;
     }
 
     applyMergeSort(): void {
