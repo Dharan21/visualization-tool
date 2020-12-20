@@ -53,9 +53,11 @@ export class CanvasComponent implements OnInit, OnDestroy {
     sortCanvas(method: number): void {
         if (this.onceShorted) {
             this.canvas = this.canvas.sort((a, b) => a - b);
+            this.cdr.detectChanges();
             const bars = document.getElementsByClassName('inner-bar');
             for(let i= 0; i < bars.length; i++) {
                 bars[i].classList.value = 'inner-bar';
+                (bars[i] as HTMLElement).style.height = (this.canvas[i] * 4) + 'px';
             }
         }
         switch (method) {
